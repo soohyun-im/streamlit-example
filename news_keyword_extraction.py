@@ -131,10 +131,10 @@ def main():
                     
                     # 다크모드 테마 확인 추가
                     current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
-                    
+
                     # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
                     if current_theme is not None:
-                        body_style = current_theme.body
+                        body_style = current_theme._get_delta().new_element.style
                         if body_style and "background-color: #1f2c56;" in body_style:
                             text_color = "#000000"
                         else:
