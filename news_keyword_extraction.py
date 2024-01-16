@@ -109,7 +109,8 @@ def main():
             st.subheader("헤드라인 뉴스")
 
             # 다크 모드일 때 글자색을 하얀색으로 변경
-            text_color = "#ffffff" if "background-color: #1f2c56;" in st.markdown("""<style>body{}</style>""", unsafe_allow_html=True) else "#000000"
+            current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
+            text_color = "#ffffff" if "background-color: #1f2c56;" in current_theme.body else "#000000"
 
             for i, data in enumerate(news_data, 1):
                 st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px; color: {text_color};'>{i}.{data['headline']}</div>", unsafe_allow_html=True)
