@@ -4,9 +4,9 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import openai
 from retrying import retry
+import os
 
-# Set OpenAI API key
-openai.api_key = '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'
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 def get_main_news_data(category):
     url = f'https://news.naver.com/main/main.nhn?mode=LSD&mid=shm&sid1={category}'
