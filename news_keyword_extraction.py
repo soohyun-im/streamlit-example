@@ -94,7 +94,7 @@ def make_request(url):
     return response
 
 def main():
-    st.title("뉴스 속 주요 키워드 추출")
+    st.title("뉴스 속 주요 키워드 추출 🔍")
 
     # 사용자로부터 뉴스 카테고리 번호 입력
     category = st.text_input(""" 
