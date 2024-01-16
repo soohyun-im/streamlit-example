@@ -6,7 +6,7 @@ from retrying import retry
 import os
 import openai
 
-st.set_page_config(page_title="뉴스 속 주요 키워드 추출", page_icon="🔍", layout="wide", initial_sidebar_state="expanded", theme="light")
+st.set_page_config(page_title="뉴스 속 주요 키워드 추출", page_icon="🔍", layout="wide", initial_sidebar_state="expanded")
 
 # Setting the API key
 openai.api_key = os.environ.get("OPENAI_API_KEY")
