@@ -94,11 +94,14 @@ def make_request(url):
 def main():
     st.title("뉴스 속 주요 키워드 추출")
 
+    # 다크 모드인 경우 글자색을 검정(#000000)으로 변경
+    text_color = "#000000" if st.get_option("theme.use_container_width") else "#ffffff"
+
     # 사용자로부터 뉴스 카테고리 번호 입력
     category = st.text_input(""" 
                              가져올 뉴스 카테고리 번호를 입력하세요
-    100(정치) | 101(경제) | 102(사회)  
-    103(생활/문화) | 104(세계) | 105(IT/과학)
+    100(정치) | 101(경제) | 102(사회) | 
+    103(생활/문화) | 104(세계) | 105(IT/과학) 
                              """)
 
     if st.button("뉴스 가져오기"):
@@ -108,7 +111,7 @@ def main():
         if news_data:
             st.subheader("헤드라인 뉴스")
             for i, data in enumerate(news_data, 1):
-                st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px;'>{i}.{data['headline']}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px; color: {text_color};'>{i}.{data['headline']}</div>", unsafe_allow_html=True)
                 st.write(f"   URL: {data['url']}")
 
                 # 기사 내용 가져오기
@@ -121,37 +124,25 @@ def main():
                 Avoid using verbs or adjectives in the extracted keywords, focus on nouns and key concepts.
                 """                    
                     extracted_keywords = ask_to_gpt35_turbo(user_request)
-                    #st.write(f"   추출된 키워드: {extracted_keywords}")
-                    #Store data in dictionary
+
+                    # Store data in dictionary
                     data['Content'] = contents[0]['content']
                     data['Extracted Keywords'] = extracted_keywords
 
                     # Display data
                     unique_keywords = list(set(data['Extracted Keywords'].split(',')))
-                    
-                    # 다크모드 테마 확인 추가
-                    current_theme = st.get_option("theme.secondaryBackgroundColor")
-                    
-                    # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
-                    if current_theme is not None and current_theme == "#1f2c56":
-                        text_color = "#000000"
-                    else:
-                        text_color = "#ffffff"  # 라이트 모드일 때의 글자색
-                   
+
                     # 배경색 추가
-                    st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
+                    st.markdown(f"<h4 style='color: {text_color};'>추출 키워드</h4>", unsafe_allow_html=True)
                     # join을 빼고 각 키워드에 배경색 적용하고 "|"로 구분
                     keywords_display = " | ".join(unique_keywords)
-                    st.markdown(f"<div style='background-color: #f0f8ff; padding: 10px;'>{keywords_display}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='background-color: #f0f8ff; color: {text_color}; padding: 10px;'>{keywords_display}</div>", unsafe_allow_html=True)
                     
                     st.markdown("<br>", unsafe_allow_html=True)
 
-                    st.markdown(f"<h6>기사 내용 전문 보기</h6>", unsafe_allow_html=True)
-                    st.markdown(f"<p style='font-size:14px'>{data['Content']}</p>", unsafe_allow_html=True)
-
+                    st.markdown(f"<h6 style='color: {text_color};'>기사 내용 전문 보기</h6>", unsafe_allow_html=True)
+                    st.markdown(f"<p style='font-size:14px; color: {text_color};'>{data['Content']}</p>", unsafe_allow_html=True)
                 
-                    # You can add more display elements or visualizations here if needed
-
                 else:
                     st.warning("내용을 가져오는 데 문제가 있습니다.")
 
