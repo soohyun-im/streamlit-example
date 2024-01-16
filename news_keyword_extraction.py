@@ -94,9 +94,6 @@ def make_request(url):
 def main():
     st.title("뉴스 속 주요 키워드 추출")
 
-    # 다크 모드인 경우 글자색을 검정(#000000)으로 변경
-    text_color = "#000000" if st.session_state.theme_use_container_width else "#ffffff"
-
     # 사용자로부터 뉴스 카테고리 번호 입력
     category = st.text_input(""" 
                              가져올 뉴스 카테고리 번호를 입력하세요
@@ -110,6 +107,10 @@ def main():
 
         if news_data:
             st.subheader("헤드라인 뉴스")
+
+            # 다크 모드일 때 글자색을 하얀색으로 변경
+            text_color = "#ffffff" if "background-color: #1f2c56;" in st.markdown("""<style>body{}</style>""", unsafe_allow_html=True) else "#000000"
+
             for i, data in enumerate(news_data, 1):
                 st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px; color: {text_color};'>{i}.{data['headline']}</div>", unsafe_allow_html=True)
                 st.write(f"   URL: {data['url']}")
