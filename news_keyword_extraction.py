@@ -97,8 +97,7 @@ def main():
     # 사용자로부터 뉴스 카테고리 번호 입력
     category = st.text_input(""" 
                              가져올 뉴스 카테고리 번호를 입력하세요
-    100(정치) | 101(경제) | 102(사회) | 
-    103(생활/문화) | 104(세계) | 105(IT/과학) 
+    100(정치) | 101(경제) | 102(사회) | 생활/문화(103) | 세계(104) | IT/과학(105) : 
                              """)
 
     if st.button("뉴스 가져오기"):
@@ -126,29 +125,22 @@ def main():
                     data['Content'] = contents[0]['content']
                     data['Extracted Keywords'] = extracted_keywords
 
-                     # Display data
-                    unique_keywords = list(set(data['Extracted Keywords'].split(','))
-                
+                    # Display data
+                    unique_keywords = list(set(data['Extracted Keywords'].split(',')))
+
                     # 배경색 추가
                     st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
                     # join을 빼고 각 키워드에 배경색 적용하고 "|"로 구분
                     keywords_display = " | ".join(unique_keywords)
-                    styled_keywords = f"<div style='background-color: #f0f8ff; color: {text_color}; padding: 10px;'>{keywords_display}</div>"
-                    st.markdown(styled_keywords, unsafe_allow_html=True)
-                
+                    st.markdown(f"<div style='background-color: #f0f8ff; padding: 10px;'>{keywords_display}</div>", unsafe_allow_html=True)
+                    
                     st.markdown("<br>", unsafe_allow_html=True)
-                
+
                     st.markdown(f"<h6>기사 내용 전문 보기</h6>", unsafe_allow_html=True)
                     st.markdown(f"<p style='font-size:14px'>{data['Content']}</p>", unsafe_allow_html=True)
+
                 
-                    # 다크모드 테마 확인 추가
-                    current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
-                    
-                    # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
-                    if current_theme is not None and "background-color: #1f2c56;" in current_theme.body:
-                        text_color = "#000000"
-                    else:
-                        text_color = "#ffffff"  # 라이트 모드일 때의 글자색
+                    # You can add more display elements or visualizations here if needed
 
                 else:
                     st.warning("내용을 가져오는 데 문제가 있습니다.")
