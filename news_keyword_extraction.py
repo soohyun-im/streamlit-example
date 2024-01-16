@@ -3,8 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from retrying import retry
-from config import OPENAI_API_KEY
 import openai
+from config import OPENAI_API_KEY
 
 openai.api_key = OPENAI_API_KEY
 
