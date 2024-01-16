@@ -1,1 +1,3 @@
 config.py
+git add .
+git commit -m "Ignore sensitive information in config.py"
