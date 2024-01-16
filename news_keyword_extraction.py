@@ -106,7 +106,7 @@ def main():
         if news_data:
             st.subheader("헤드라인 뉴스")
             for i, data in enumerate(news_data, 1):
-                st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px;'>{i}.{data['headline']}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px;'>{i}.{data[' headline']}</div>", unsafe_allow_html=True)
                 st.write(f"   URL: {data['url']}")
 
                 # 기사 내용 가져오기
@@ -119,7 +119,7 @@ def main():
                 """                    
                     extracted_keywords = ask_to_gpt35_turbo(user_request)
                     #st.write(f"   추출된 키워드: {extracted_keywords}")
-                    # Store data in dictionary
+                    #Store data in dictionary
                     data['Content'] = contents[0]['content']
                     data['Extracted Keywords'] = extracted_keywords
 
