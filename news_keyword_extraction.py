@@ -95,7 +95,7 @@ def main():
     st.title("뉴스 속 주요 키워드 추출")
 
     # 다크 모드인 경우 글자색을 검정(#000000)으로 변경
-    text_color = "#000000" if st.get_option("theme.use_container_width") else "#ffffff"
+    text_color = "#000000" if st.session_state.theme_use_container_width else "#ffffff"
 
     # 사용자로부터 뉴스 카테고리 번호 입력
     category = st.text_input(""" 
