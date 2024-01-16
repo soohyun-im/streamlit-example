@@ -98,7 +98,7 @@ def main():
     category = st.text_input(""" 
                              가져올 뉴스 카테고리 번호를 입력하세요
     100(정치) | 101(경제) | 102(사회) | 
-    103(생활/문화) | 104(세계) | 105(IT/과학) : 
+    103(생활/문화) | 104(세계) | 105(IT/과학) 
                              """)
 
     if st.button("뉴스 가져오기"):
@@ -129,6 +129,16 @@ def main():
                     # Display data
                     unique_keywords = list(set(data['Extracted Keywords'].split(',')))
 
+                    #다크모드 테마 확인 추가
+
+                    current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
+
+                    # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
+                    if "background-color: #1f2c56;" in current_theme:
+                        text_color = "#000000"
+                    else:
+                        text_color = "#ffffff"  # 라이트 모드일 때의 글자색
+                    
                     # 배경색 추가
                     st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
                     # join을 빼고 각 키워드에 배경색 적용하고 "|"로 구분
@@ -142,6 +152,15 @@ def main():
 
                 
                     # You can add more display elements or visualizations here if needed
+                    #다크모드 테마 확인 추가
+                    current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
+
+                    # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
+                    if "background-color: #1f2c56;" in current_theme:
+                        text_color = "#000000"
+                    else:
+                        text_color = "#ffffff"  # 라이트 모드일 때의 글자색
+                    st.markdown(styled_keywords, unsafe_allow_html=True)
 
                 else:
                     st.warning("내용을 가져오는 데 문제가 있습니다.")
