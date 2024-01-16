@@ -127,16 +127,7 @@ def main():
                     data['Extracted Keywords'] = extracted_keywords
 
                      # Display data
-                    unique_keywords = list(set(data['Extracted Keywords'].split(',')))
-                
-                    # 다크모드 테마 확인 추가
-                    current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
-                    
-                    # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
-                    if current_theme is not None and "background-color: #1f2c56;" in current_theme.body:
-                        text_color = "#000000"
-                    else:
-                        text_color = "#ffffff"  # 라이트 모드일 때의 글자색
+                    unique_keywords = list(set(data['Extracted Keywords'].split(','))
                 
                     # 배경색 추가
                     st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
@@ -152,13 +143,12 @@ def main():
                 
                     # 다크모드 테마 확인 추가
                     current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
-                
+                    
                     # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
-                    if "background-color: #1f2c56;" in current_theme:
+                    if current_theme is not None and "background-color: #1f2c56;" in current_theme.body:
                         text_color = "#000000"
                     else:
                         text_color = "#ffffff"  # 라이트 모드일 때의 글자색
-                    st.markdown(styled_keywords, unsafe_allow_html=True)
 
                 else:
                     st.warning("내용을 가져오는 데 문제가 있습니다.")
