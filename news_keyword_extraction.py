@@ -128,7 +128,16 @@ def main():
 
                     # Display data
                     unique_keywords = list(set(data['Extracted Keywords'].split(',')))
+                    
+                    # 다크모드 테마 확인 추가
+                    current_theme = st.markdown("""<style>body{}</style>""", unsafe_allow_html=True)
 
+                    # 다크 모드인 경우에만 글자색을 검정(#000000)으로 변경
+                    if current_theme is not None and "background-color: #1f2c56;" in current_theme.body:
+                        text_color = "#000000"
+                    else:
+                        text_color = "#ffffff"  # 라이트 모드일 때의 글자색
+                   
                     # 배경색 추가
                     st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
                     # join을 빼고 각 키워드에 배경색 적용하고 "|"로 구분
