@@ -133,8 +133,9 @@ def main():
                     st.write("뉴스 내용 분석 중...")
 
                     # GPT-3.5 Turbo 모델에 기사 내용을 입력하여 주요 단어 추출
-                    user_request = f"""Extract all searchable keywords or terms and provide full names, abbreviations, and explanations.:  {contents[0]['content']}
-                """
+                    user_request = f"""Extract important keywords from the news: {contents[0]['content']}
+                Avoid using verbs or adjectives in the extracted keywords, focus on nouns and key concepts. """
+                    
                     extracted_keywords = ask_to_gpt35_turbo(user_request)
 
                     # Display data
