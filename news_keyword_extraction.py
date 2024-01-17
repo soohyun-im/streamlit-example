@@ -6,7 +6,12 @@ from retrying import retry
 import os
 import openai
 
-st.set_page_config(page_title="뉴스 속 주요 키워드 추출", page_icon="🔍", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="뉴스 속 주요 키워드 추출",
+    page_icon="🔍",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # Setting the API key
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -99,8 +104,8 @@ def main():
     # 사용자로부터 뉴스 카테고리 번호 입력
     category = st.text_input(""" 
                              가져올 뉴스 카테고리 번호를 입력하세요
-    100(정치) | 101(경제) | 102(사회)  
-    103(생활/문화) | 104(세계) | 105(IT/과학)
+    100(정치) | 101(경제) | 102(사회) | 
+    103(생활/문화) | 104(세계) | 105(IT/과학) 
                              """)
 
     if st.button("뉴스 가져오기"):
@@ -110,7 +115,16 @@ def main():
         if news_data:
             st.subheader("헤드라인 뉴스")
             for i, data in enumerate(news_data, 1):
-                st.markdown(f"<div style='background-color: #f4f4f4; padding: 5px;'>{i}.{data['headline']}</div>", unsafe_allow_html=True)
+                # Determine text color based on background color
+                background_color = st.session_state.background_color if "background_color" in st.session_state else "#FFFFFF"
+                text_color = "#262730" if background_color == "#FFFFFF" else "#FFFFFF"
+
+                # Adjust the style for dark mode
+                div_style = f"padding: 5px; {'background-color: #F0F2F6;' if background_color != '#1E1E1E' else ''}"
+                st.markdown(
+                    f"<div style='color: {text_color}; {div_style}'>{i}.{data['headline']}</div>",
+                    unsafe_allow_html=True,
+                )
                 st.write(f"   URL: {data['url']}")
 
                 # 기사 내용 가져오기
@@ -121,29 +135,30 @@ def main():
                     # GPT-3.5 Turbo 모델에 기사 내용을 입력하여 주요 단어 추출
                     user_request = f"""Extract important keywords from the news: {contents[0]['content']}
                 Avoid using verbs or adjectives in the extracted keywords, focus on nouns and key concepts.
-                """                    
+                """
                     extracted_keywords = ask_to_gpt35_turbo(user_request)
-                    #st.write(f"   추출된 키워드: {extracted_keywords}")
-                    #Store data in dictionary
-                    data['Content'] = contents[0]['content']
-                    data['Extracted Keywords'] = extracted_keywords
 
                     # Display data
-                    unique_keywords = list(set(data['Extracted Keywords'].split(',')))
+                    unique_keywords = list(set(extracted_keywords.split(',')))
 
-                    # 배경색 추가
                     st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
-                    # join을 빼고 각 키워드에 배경색 적용하고 "|"로 구분
-                    keywords_display = " | ".join(unique_keywords)
-                    st.markdown(f"<div style='background-color: #f0f8ff; padding: 10px;'>{keywords_display}</div>", unsafe_allow_html=True)
+                    # Display extracted keywords with dynamic text color
+                    keyword_bg_color = "#f0f8ff" if background_color != '#1E1E1E' else ''
+                    st.markdown(
+                        f"<div style='color: {text_color}; background-color: {keyword_bg_color}; padding: 10px;'>{' | '.join(unique_keywords)}</div>",
+                        unsafe_allow_html=True,
+                    )
                     
                     st.markdown("<br>", unsafe_allow_html=True)
 
                     st.markdown(f"<h6>기사 내용 전문 보기</h6>", unsafe_allow_html=True)
-                    st.markdown(f"<p style='font-size:14px'>{data['Content']}</p>", unsafe_allow_html=True)
 
-                
-                    # You can add more display elements or visualizations here if needed
+                    # Adjust the style for dark mode in detailed content
+                    content_style = f"font-size: 14px; color: {text_color}; {'background-color: #FFFFFF;' if background_color != '#1E1E1E' else ''}"
+                    st.markdown(
+                        f"<p style='{content_style}'>{contents[0]['content']}</p>",
+                        unsafe_allow_html=True,
+                    )
 
                 else:
                     st.warning("내용을 가져오는 데 문제가 있습니다.")
@@ -154,6 +169,7 @@ def main():
             # Display the entire DataFrame
             st.subheader("전체 데이터 프레임")
             st.write(df)
+
 
 if __name__ == "__main__":
     main()
