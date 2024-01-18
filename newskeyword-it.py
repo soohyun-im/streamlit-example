@@ -76,7 +76,7 @@ def ask_to_gpt35_turbo(user_input):
             기술이란 유 무형의 기술 및 서비스와 제품을 포함하는 개념이며, 뉴스에서 소개하고자하는 중심내용입니다. 
             아래의 제약조건과 출력형식에따라 입력문에 대한 단어목록을 작성해주세요  
             해당 단어목록을 통해 IT기사에 나온 기업과 기술, 행사 목록을 user에게 빠르게 전달하는 것이 목적입니다.
-            단어 구분을 쉽게할수있도록 기업명,행사명,기술명은 새로운 행으로 작성해주세요 
+            Please output the keywords in the following format:\n- 기업: [Company Names](english name)\n- 행사: [Event Names](english name)\n- 기술: [Technology Names](english name)
             """},
             
             {"role": "user", "content": user_input},
@@ -92,12 +92,12 @@ def ask_to_gpt35_turbo(user_input):
               -코드블록은 포함하지않습니다.
               
               
-              #출력 형식(단어 구분을 쉽게할수있도록 기업명,행사명,기술명은 새로운 행으로 작성해주세요)
-              -기업명 : 단어(영문명) , 단어(영문명)
+              #출력 형식
+              -기업 : [Company Names](english name) , [Company Names](english name)
 
-              -행사명 : 단어(영문명) , 단어(영문명)
+              -행사 : [Event Names](english name) , [Event Names](english name)
 
-              -기술명 : 단어(영문명) , 단어(영문명)
+              -기술 : [Technology Names](english name) , [Technology Names](english name)
 
               #출력 예시
                 -기업명 : CJ온스타일(CJ Onstyle), 삼성전자(Samsung Electronics)
