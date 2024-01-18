@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import openpyxl from pandas
+import openpyxl
 from retrying import retry
 import os
 import openai
