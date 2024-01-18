@@ -93,16 +93,12 @@ def ask_to_gpt35_turbo(user_input):
               
               
               #출력 형식
-              -기업 : [Company Names](english name) , [Company Names](english name)
-
-              -행사 : [Event Names](english name) , [Event Names](english name)
-
-              -기술 : [Technology Names](english name) , [Technology Names](english name)
+              \n- 기업: [Company Names](english name)\n- 행사: [Event Names](english name)\n- 기술: [Technology Names](english name)
 
               #출력 예시
-                -기업명 : CJ온스타일(CJ Onstyle), 삼성전자(Samsung Electronics)
-                -행사명 : 갤럭시 언팩 2024(Galaxy Unpacked 2024)
-                -기술명 : 갤럭시 S24 시리즈(Galaxy S24 series), 생성형 AI(Generative AI)
+                -기업 : CJ온스타일(CJ Onstyle), 삼성전자(Samsung Electronics)
+                -행사 : 갤럭시 언팩 2024(Galaxy Unpacked 2024)
+                -기술 : 갤럭시 S24 시리즈(Galaxy S24 series), 생성형 AI(Generative AI)
             
 
               #도출과정
