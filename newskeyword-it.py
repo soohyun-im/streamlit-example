@@ -92,7 +92,7 @@ def ask_to_gpt35_turbo(user_input):
               -코드블록은 포함하지않습니다.
               
               
-              #출력 형식
+              #출력 형식(단어 구분을 쉽게할수있도록 기업명,행사명,기술명은 새로운 행으로 작성해주세요)
               -기업명 : 단어(영문명) , 단어(영문명)
 
               -행사명 : 단어(영문명) , 단어(영문명)
@@ -126,7 +126,7 @@ def make_request(url):
     return response
 
 def main():
-    st.title("IT 뉴스 속 기업명/기술명 키워드 추출 🔍")
+    st.title("IT 뉴스 속 기업/기술/행사 키워드 찾기 🔍")
     category = 105
     if st.button("뉴스 가져오기"):
         # 뉴스 데이터 가져오기
