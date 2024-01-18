@@ -72,33 +72,47 @@ def ask_to_gpt35_turbo(user_input):
         messages=[
             {"role": "system", 
              "content": """
-            You are an experienced AI expert extracting company and organization names and technology names mentioned in news articles.
-            Please extract the names of companies, organizations, and technologies that appear in the delivered content.
-    
-            Next to the extracted word, write the word's classification criteria (e.g. company name, organization name, technology name).
-
-            Your goal is to provide a list of keywords for companies, organizations, and technologies mentioned in news articles.
-
-            Words other than company names, organization names, or technology names must never be included in the list.
-            If there is no word matching the condition, extract it as none.
-
-            After extracting words, you can list the words by dividing them into company and organization names and technology names. After that, please write in the following format:
-                'Company/Organization Names:
-                Ministry of Science and ICT (Organization), Korean Association of University Professors (Organization), Korea University Professors' Union (Organization), Korea University (University), Korea Society for Subjectivity Research (Organization), Office of the President (Organization)
-
-                Technology Names:
-                Energy Mix (Technology), Schema (Technology)'
-            The words you extracted should be separated by ',' 
-            When listing, always list 'Company/Organization Names' and corresponding words first, followed by 'Technology Names' and corresponding words.
+            당신은 세상의 모든 기업과 기술 및 행사정보에 대해 알고있는 IT백과사전입니다. 전달된 IT뉴스를 보고 기사에나온 기업명과 기술명 그리고 행사명을 찾아주세요
+            기술이란 유 무형의 기술 및 서비스와 제품을 포함하는 개념이며, 뉴스에서 소개하고자하는 중심내용입니다. 
+            아래의 제약조건과 출력형식에따라 입력문에 대한 단어목록을 작성해주세요  
+            해당 단어목록을 통해 IT기사에 나온 기업과 기술, 행사 목록을 user에게 빠르게 전달하는 것이 목적입니다.
+            단어 구분을 쉽게할수있도록 기업명,행사명,기술명은 새로운 행으로 작성해주세요 
             """},
             
             {"role": "user", "content": user_input},
             
             {"role": "assistant", 
              "content": """
-              Words other than company names, organization names, or technology names must never be included in the list. 
-              the words you extracted should be separated by ',' 
-            When listing, always list 'Company/Organization Names' and corresponding words first, followed by 'Technology Names' and corresponding words.
+              #제약조건
+              -단어는 최소한의 명사단위로 나눠서 추출합니다
+              -병기할 단어가 없는 경우를 제외하고 한글로 적혀있는 경우 영문명을 병기하고, 영문명일경우 한글명을 반드시 병기합니다.
+              -추출 시 각각 단어를 중복 추출하지않습니다.
+              -기업명,기술명 그리고 행사명이 아닌 단어는 출력하지않습니다. 
+              -해당하는 단어가 존재하지않는경우 'none'이라고 표시합니다.
+              -코드블록은 포함하지않습니다.
+              
+              
+              #출력 형식
+              -기업명 : 단어(영문명) , 단어(영문명)
+
+              -행사명 : 단어(영문명) , 단어(영문명)
+
+              -기술명 : 단어(영문명) , 단어(영문명)
+
+              #출력 예시
+                -기업명 : CJ온스타일(CJ Onstyle), 삼성전자(Samsung Electronics)
+                -행사명 : 갤럭시 언팩 2024(Galaxy Unpacked 2024)
+                -기술명 : 갤럭시 S24 시리즈(Galaxy S24 series), 생성형 AI(Generative AI)
+            
+
+              #도출과정
+              1. 질문에대한 내용이 주어진 기사에있는지 확인한다
+              2. 정보안에 내용이 있는경우 정해진 출력형식으로 출력한다.
+              3. 정보안에 내용이 없는경우 없음 이라고 출력한다.
+              4. 출력형식 이외의 단어나 설명은 포함하지않는다.
+
+            
+
              """}
         ]
     )
@@ -139,10 +153,15 @@ def main():
                     st.write("뉴스 내용 분석 중...")
 
                     # GPT-3.5 Turbo 모델에 기사 내용을 입력하여 주요 단어 추출
-                    user_request = f"""Extract company,organization names and technology names mentioned in news articles: {contents[0]['content']}
-                
-                """
+                    user_request = f"""
+                    다음 뉴스를 보고 기업명,기술명,행사명을 찾아 출력형식대로 출력해주세요: 
+                    {contents[0]['content']}
+                    """
                     extracted_keywords = ask_to_gpt35_turbo(user_request)
+
+                    # Store data in dictionary
+                    data['Content'] = contents[0]['content']
+                    data['Extracted Keywords'] = extracted_keywords
 
                     # Display data
                     #unique_keywords = list(set(extracted_keywords.split(',')))
@@ -168,6 +187,7 @@ def main():
 
                 else:
                     st.warning("내용을 가져오는 데 문제가 있습니다.")
+
 
             # Convert dictionary to DataFrame
             df = pd.DataFrame(news_data)
