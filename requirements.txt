@@ -7,3 +7,4 @@ retry
 requests
 retrying
 bs4
+openpyxl
