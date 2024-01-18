@@ -193,6 +193,12 @@ def main():
             st.subheader("전체 데이터 프레임")
             st.write(df)
 
+            excel_file_path = "itnewskeyword.xlsx"  # 원하는 파일 이름과 경로를 설정해주세요.
+            df.to_excel(excel_file_path, index=False)
+            
+            # Display a link to download the Excel file
+            st.markdown(f"### [Download Excel File]({excel_file_path})")
+
 
 if __name__ == "__main__":
     main()
