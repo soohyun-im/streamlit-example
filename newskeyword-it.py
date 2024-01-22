@@ -72,41 +72,47 @@ def ask_to_gpt35_turbo(user_input):
         messages=[
             {"role": "system", 
              "content": """
-            당신은 세상의 모든 기업과 기술 및 행사정보에 대해 알고있는 IT백과사전입니다. 전달된 IT뉴스를 보고 기사에나온 기업명과 기술명 그리고 행사명을 찾아주세요
-            기술이란 유 무형의 기술 및 서비스와 제품을 포함하는 개념이며, 뉴스에서 소개하고자하는 중심내용입니다. 
-            아래의 제약조건과 출력형식에따라 입력문에 대한 단어목록을 작성해주세요  
-            해당 단어목록을 통해 IT기사에 나온 기업과 기술, 행사 목록을 user에게 빠르게 전달하는 것이 목적입니다.
-            Please output the keywords in the following format:\n- 기업: [Company Names](english name)\n- 행사: [Event Names](english name)\n- 기술: [Technology Names](english name)
+            You are an IT encyclopedia that knows information about all companies, technologies, and events in the world.
+               Please look at the IT news we deliver and look for the company name, technology name, and event name in the article.
+               Technology is a concept that encompasses both tangible and intangible technologies, services, and products, and is the core content that introduced in the news.
+               Please create a word list for the input sentence according to the constraints and output format below.
+               The purpose is to quickly convey to users a list of companies, technologies, and events that appear in IT articles through a word list.
+               Please write the company name, event name, technology name, etc. on one line so that the words can be easily distinguished.
             """},
             
             {"role": "user", "content": user_input},
             
             {"role": "assistant", 
              "content": """
-              #제약조건
-              -단어는 최소한의 명사단위로 나눠서 추출합니다
-              -병기할 단어가 없는 경우를 제외하고 한글로 적혀있는 경우 영문명을 병기하고, 영문명일경우 한글명을 반드시 병기합니다.
-              -추출 시 각각 단어를 중복 추출하지않습니다.
-              -기업명,기술명 그리고 행사명이 아닌 단어는 출력하지않습니다.
-              -나열되는 단어는 ',' 로 구분합니다.
-              -해당하는 단어가 존재하지않는경우 'none'이라고 표시합니다.
-              -코드블록은 포함하지않습니다.
+              #Constraints
+               -Words are divided into minimal noun units and extracted.
+               -Except in cases where there are no words to be written together, if it is written in Korean, the English name must be written side by side, and if it is an English name, the Korean name must be written side by side.
+               - Please include the official site address link for each extracted word.
+               -During extraction, each word is not duplicated.
+               -Words other than company name, technology name, and event name are not extracted.
+               -If the official site cannot be confirmed, the site address will not be extracted.
+               -If the word matching the condition does not exist, 'none' is displayed.
+               -Code blocks are not included.
               
               
-              #출력 형식
-              \n- 기업: [Company Names](english name)\n- 행사: [Event Names](english name)\n- 기술: [Technology Names](english name)
+               #output format
+               -Company name: Word (English name) (official site link), Word (English name) (official site link)
 
-              #출력 예시
-                -기업 : CJ온스타일(CJ Onstyle), 삼성전자(Samsung Electronics)
-                -행사 : 갤럭시 언팩 2024(Galaxy Unpacked 2024)
-                -기술 : 갤럭시 S24 시리즈(Galaxy S24 series), 생성형 AI(Generative AI)
+               -Event name: Word (English name) (official site link), Word (English name) (official site link)
+
+               -Technology name: Word (English name) (official site link), Word (English name) (official site link)
+
+               #Output example
+                 -Company name: CJ Onstyle (https://display.cjonstyle.com/), Samsung Electronics (www.samsung.com)
+                 -Event name: Galaxy Unpacked 2024
+                 -Technology name: Galaxy S24 series, Generative AI
             
 
-              #도출과정
-              1. 질문에대한 내용이 주어진 기사에있는지 확인한다
-              2. 정보안에 내용이 있는경우 정해진 출력형식으로 출력한다.
-              3. 정보안에 내용이 없는경우 없음 이라고 출력한다.
-              4. 출력형식 이외의 단어나 설명은 포함하지않는다.
+               #Derivative process
+               1. Check whether the requested content is in the given article.
+               2. If there is content in the information, it is output in a designated output format.
+               3. If there is no content in the information, it is output as “none.”
+               4. Words or descriptions other than the output format are not included.
 
             
 
@@ -123,7 +129,7 @@ def make_request(url):
     return response
 
 def main():
-    st.title("IT 뉴스 속 기업/기술/행사 키워드 찾기 🔍")
+    st.title("IT 뉴스 속 기업명/기술명 키워드 추출 🔍")
     category = 105
     if st.button("뉴스 가져오기"):
         # 뉴스 데이터 가져오기
@@ -151,7 +157,7 @@ def main():
 
                     # GPT-3.5 Turbo 모델에 기사 내용을 입력하여 주요 단어 추출
                     user_request = f"""
-                    다음 뉴스를 보고 기업명,기술명,행사명을 찾아 출력형식대로 출력해주세요: 
+                    Please read the following news, find the company name, technology name, and event name and print it out in the following format: 
                     {contents[0]['content']}
                     """
                     extracted_keywords = ask_to_gpt35_turbo(user_request)
@@ -192,7 +198,6 @@ def main():
             # Display the entire DataFrame
             st.subheader("전체 데이터 프레임")
             st.write(df)
-
 
 
 if __name__ == "__main__":
