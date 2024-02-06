@@ -2,10 +2,12 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from retrying import retry
 import os
 import openai
+from datetime import datetime
+from retrying import retry
 
+# Streamlit 페이지 설정
 st.set_page_config(
     page_title="뉴스 속 주요 키워드 추출",
     page_icon="🔍",
@@ -13,63 +15,52 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Setting the API key
+# OpenAI API 키 설정
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-def get_main_news_data(category):
-    url = f'https://news.naver.com/main/main.nhn?mode=LSD&mid=shm&sid1={category}'
+# 특정 날짜에 대한 네이버 섹션 105의 헤드라인 뉴스 가져오기
+def get_headline_news_by_date(target_date):
+    url = f'https://news.naver.com/main/list.nhn?mode=LSD&mid=sec&sid1=105&date={target_date}'
     response = requests.get(url)
-
     if response.status_code != 200:
         st.error(f"뉴스를 가져오는 데 문제가 발생했습니다. 응답 코드: {response.status_code}")
-        return []
+        return [], []
 
     soup = BeautifulSoup(response.text, 'html.parser')
+    headline_news_list = soup.select('.list_body.newsflash_body .type06_headline li')
 
-    data_list = []
+    headlines = []
+    urls = []
 
-    # Find URLs and headlines with class sh_text
-    sh_text_elements = soup.select('.sh_text')
-    if sh_text_elements:
-        for i, element in enumerate(sh_text_elements, 1):
-            link = element.find('a')
-            if link and 'href' in link.attrs:
-                news_url = link['href']
-                headline = link.get_text(strip=True)
-                data_list.append({'url': news_url, 'headline': headline})
+    for news in headline_news_list:
+        headline = news.select_one('dt:not(.photo) a').text.strip()
+        link = news.select_one('dt:not(.photo) a')['href']
+        
+        headlines.append(headline)
+        urls.append(link)
 
-    return data_list
+    return headlines, urls
 
-def get_contents_from_urls(news_data):
-    contents_list = []
+# URL에서 기사 내용 가져오기
+def get_contents_from_urls(news_urls):
+    contents = []
 
-    for data in news_data:
-        url = data['url']
-        headline = data['headline']
-
-        # 각 기사 html 가져오기
-        news = make_request(url)
+    for url in news_urls:
+        news = requests.get(url)
         news_html = BeautifulSoup(news.text, "html.parser")
 
-        # 기사 내용 가져오기 (id="dic_area"인 div 태그의 내용 모두 가져오기)
-        dic_area = news_html.find(id="dic_area")
-        if dic_area:
-            # Remove unnecessary tags (script, a, span, etc.)
-            for tag in dic_area(['script', 'a', 'span']):
-                tag.decompose()
+        paragraphs = news_html.find_all(id="dic_area")
+        content = ' '.join(paragraph.get_text(strip=True) for paragraph in paragraphs)
 
-            # Extract text content
-            content = dic_area.get_text(strip=True)
-            contents_list.append({'headline': headline, 'content': content})
-        else:
-            st.warning(f"기사 내용을 찾을 수 없습니다. URL: {url}")
+        contents.append(content)
 
-    return contents_list
+    return contents
 
-def ask_to_gpt35_turbo(user_input):
+# GPT를 사용하여 텍스트에서 주요 키워드 추출
+def ask_to_gpt_for_keywords(text):
     response = openai.chat.completions.create(
         model="gpt-4-1106-preview",
-        messages=[
+       messages=[
             {"role": "system", 
              "content": """
             You are an IT encyclopedia that knows information about all companies, technologies, and events in the world.
@@ -80,7 +71,7 @@ def ask_to_gpt35_turbo(user_input):
                Please write the company name, event name, technology name, etc. on one line so that the words can be easily distinguished.
             """},
             
-            {"role": "user", "content": user_input},
+            {"role": "user", "content": text},
             
             {"role": "assistant", 
              "content": """
@@ -116,10 +107,9 @@ def ask_to_gpt35_turbo(user_input):
              """}
         ]
     )
-
     return response.choices[0].message.content
 
-@retry(stop_max_attempt_number=3, wait_fixed=1000)  # 3번 재시도하며 1초 간격으로
+@retry(stop_max_attempt_number=3, wait_fixed=1000)
 def make_request(url):
     response = requests.get(url, timeout=10)
     response.raise_for_status()
@@ -128,75 +118,24 @@ def make_request(url):
 def main():
     st.title("IT 뉴스 속 기업명/기술명 키워드 추출 🔍")
     st.subheader("※ 뉴스 가져오기 실행 시 GPT비용이 발생하므로 신중하게 클릭해주세요")
-    category = 105
+
+    target_date = st.date_input("뉴스 날짜 선택", datetime.today())
+    formatted_target_date = target_date.strftime('%Y%m%d')
+
     if st.button("뉴스 가져오기"):
-        # 뉴스 데이터 가져오기
-        news_data = get_main_news_data(category)
-
-        if news_data:
-            st.subheader("헤드라인 뉴스")
-            for i, data in enumerate(news_data, 1):
-                # Determine text color based on background color
-                background_color = st.session_state.background_color if "background_color" in st.session_state else "#FFFFFF"
-                text_color = "#262730" if background_color == "#FFFFFF" else "#FFFFFF"
-
-                # Adjust the style for dark mode
-                div_style = f"padding: 5px; {'background-color: #F0F2F6;' if background_color != '#1E1E1E' else ''}"
-                st.markdown(
-                    f"<div style='color: {text_color}; {div_style}'>{i}.{data['headline']}</div>",
-                    unsafe_allow_html=True,
-                )
-                st.write(f"   URL: {data['url']}")
-
-                # 기사 내용 가져오기
-                contents = get_contents_from_urls([data])
+        headlines, urls = get_headline_news_by_date(formatted_target_date)
+    
+        if headlines:
+            for i, (headline, url) in enumerate(zip(headlines, urls), 1):
+                st.write(f"{i}. {headline} - [기사 보기]({url})")
+                contents = get_contents_from_urls([url])
                 if contents:
-                    st.write("뉴스 내용 분석 중...")
-
-                    # GPT-3.5 Turbo 모델에 기사 내용을 입력하여 주요 단어 추출
-                    user_request = f"""
-                    Please read the following news, find the company name, technology name, and event name and print it out in the following format: 
-                    {contents[0]['content']}
-                    """
-                    extracted_keywords = ask_to_gpt35_turbo(user_request)
-
-                    # Store data in dictionary
-                    data['Content'] = contents[0]['content']
-                    data['Extracted Keywords'] = extracted_keywords
-
-                    # Display data
-                    #unique_keywords = list(set(extracted_keywords.split(',')))
-
-                    st.markdown(f"<h4>추출 키워드</h4>", unsafe_allow_html=True)
-                    # Display extracted keywords with dynamic text color
-                    keyword_bg_color = "#f0f8ff" if background_color != '#1E1E1E' else ''
-                    st.markdown(
-                        f"<div style='color: {text_color}; background-color: {keyword_bg_color}; padding: 10px;'>{extracted_keywords}</div>",
-                        unsafe_allow_html=True,
-                    )
-                    
-                    st.markdown("<br>", unsafe_allow_html=True)
-
-                    st.markdown(f"<h6>기사 내용 전문 보기</h6>", unsafe_allow_html=True)
-
-                    # Adjust the style for dark mode in detailed content
-                    content_style = f"font-size: 14px; color: {text_color}; {'background-color: #FFFFFF;' if background_color != '#1E1E1E' else ''}"
-                    st.markdown(
-                        f"<p style='{content_style}'>{contents[0]['content']}</p>",
-                        unsafe_allow_html=True,
-                    )
-
+                    keywords = ask_to_gpt_for_keywords(contents[0])
+                    st.write(f"추출된 키워드: {keywords}")
                 else:
-                    st.warning("내용을 가져오는 데 문제가 있습니다.")
-
-
-            # Convert dictionary to DataFrame
-            df = pd.DataFrame(news_data)
-
-            # Display the entire DataFrame
-            st.subheader("전체 데이터 프레임")
-            st.write(df)
-
+                    st.error("기사 내용을 가져올 수 없습니다.")
+        else:
+            st.error(f"{target_date}에 해당하는 뉴스가 없습니다.")
 
 if __name__ == "__main__":
     main()
