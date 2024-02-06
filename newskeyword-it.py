@@ -117,6 +117,7 @@ def make_request(url):
 
 def main():
     st.title("뉴스 속 주요 키워드 추출 🔍")
+    st.subheader("※ 뉴스 가져오기 실행 시 GPT비용이 발생하므로 신중하게 클릭해주세요")
     target_date = st.date_input("뉴스 날짜 선택", datetime.today())
     formatted_target_date = target_date.strftime('%Y%m%d')  # 날짜 형식 변환
 
