@@ -113,9 +113,6 @@ def ask_to_gpt35_turbo(user_input):
                2. If there is content in the information, it is output in a designated output format.
                3. If there is no content in the information, it is output as “none.”
                4. Words or descriptions other than the output format are not included.
-
-            
-
              """}
         ]
     )
@@ -130,6 +127,7 @@ def make_request(url):
 
 def main():
     st.title("IT 뉴스 속 기업명/기술명 키워드 추출 🔍")
+    st.subheader("※ 뉴스 가져오기 실행 시 GPT비용이 발생하므로 신중하게 클릭해주세요")
     category = 105
     if st.button("뉴스 가져오기"):
         # 뉴스 데이터 가져오기
